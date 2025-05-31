@@ -1,0 +1,40 @@
+@font-face {
+  font-display: block;
+  font-family: "bootstrap-icons";
+  src: url("../fonts/bootstrap-icons.woff2") format("woff2"),
+       url("../fonts/bootstrap-icons.woff") format("woff");
+}
+
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  display: inline-block;
+  font-family: bootstrap-icons !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: -.125em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icon definitions */
+.bi-plus-circle::before { content: "\f4fe"; }
+.bi-pencil::before { content: "\f4cb"; }
+.bi-trash::before { content: "\f5de"; }
+.bi-check-circle::before { content: "\f26a"; }
+.bi-clock::before { content: "\f293"; }
+.bi-person::before { content: "\f4d7"; }
+.bi-list-task::before { content: "\f4ae"; }
+.bi-graph-up::before { content: "\f4a8"; }
+.bi-gear::before { content: "\f49e"; }
+.bi-box-arrow-right::before { content: "\f1c8"; }
+.bi-calendar::before { content: "\f1e5"; }
+.bi-flag::before { content: "\f417"; }
+.bi-person-check::before { content: "\f4d5"; }
+.bi-check2-circle::before { content: "\f26c"; }
+.bi-x-circle::before { content: "\f622"; }
+.bi-exclamation-circle::before { content: "\f33c"; }
+ 

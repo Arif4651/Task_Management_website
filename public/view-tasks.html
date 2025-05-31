@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Tasks - Task Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --in-progress-color: #3498db;
+            --completed-color: #27ae60;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .user-info {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #6c757d;
+            margin-right: 1.5rem;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+        }
+
+        .task-card.priority-high {
+            border-left-color: var(--danger-color);
+        }
+
+        .task-card.priority-medium {
+            border-left-color: var(--warning-color);
+        }
+
+        .task-card.priority-low {
+            border-left-color: var(--success-color);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .task-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .task-description {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            color: #6c757d;
+        }
+
+        .task-meta-item i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .status-in-progress { 
+            background: #cce5ff; 
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        
+        .status-completed { 
+            background: #d4edda; 
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .priority-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .priority-medium {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .priority-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .back-button {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: #f8f9fa;
+            color: #357abd;
+            transform: translateX(-2px);
+        }
+
+        .no-tasks {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+
+        .no-tasks i {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+
+        .task-count {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .count-item {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: #f8f9fa;
+        }
+
+        .count-item h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .count-item p {
+            margin: 0.5rem 0 0;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">User Tasks</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- User Info Section -->
+        <div class="user-info">
+            <div class="d-flex align-items-center">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h2 class="h4 mb-1" id="userName">Loading...</h2>
+                    <p class="text-muted mb-0" id="userEmail">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Statistics -->
+        <div class="task-count">
+            <div class="count-item">
+                <h3 id="totalTasks">0</h3>
+                <p>Total Tasks</p>
+            </div>
+            <div class="count-item">
+                <h3 id="inProgressTasks">0</h3>
+                <p>In Progress</p>
+            </div>
+            <div class="count-item">
+                <h3 id="completedTasks">0</h3>
+                <p>Completed</p>
+            </div>
+        </div>
+
+        <!-- Tasks List -->
+        <div id="tasksList">
+            <!-- Tasks will be populated here -->
+        </div>
+
+        <!-- No Tasks Message -->
+        <div id="noTasks" class="no-tasks" style="display: none;">
+            <i class="fas fa-tasks"></i>
+            <h3>No Tasks Found</h3>
+            <p class="text-muted">This user hasn't been assigned any tasks yet.</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentUser = null;
+
+        // Get user email from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userEmail = urlParams.get('userEmail');
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!userEmail) {
+                showError('No user email provided');
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 2000);
+                return;
+            }
+
+            try {
+                // Show loading state
+                document.getElementById('userName').textContent = 'Loading...';
+                document.getElementById('userEmail').textContent = 'Loading...';
+                document.getElementById('tasksList').innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div></div>';
+
+                // Load user details first
+                const userDetails = await loadUserDetails();
+                if (!userDetails) {
+                    throw new Error('Failed to load user details');
+                }
+
+                // Then load user tasks
+                await loadUserTasks();
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                showError(error.message || 'Failed to load user data');
+                // Clear loading states
+                document.getElementById('userName').textContent = 'Error';
+                document.getElementById('userEmail').textContent = 'Failed to load user data';
+                document.getElementById('tasksList').innerHTML = '';
+            }
+        });
+
+        // Load user details
+        async function loadUserDetails() {
+            try {
+                console.log('Fetching user details for email:', userEmail);
+                const response = await fetch(`${API_BASE}/users/email/${encodeURIComponent(userEmail)}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch user details');
+                }
+                
+                const user = await response.json();
+                console.log('User details loaded:', user);
+
+                if (!user) {
+                    throw new Error('User not found');
+                }
+
+                currentUser = user;
+
+                // Update user info in the header
+                document.getElementById('userName').textContent = user.full_name;
+                document.getElementById('userEmail').textContent = user.email;
+
+                return user;
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                throw error;
+            }
+        }
+
+        // Load user tasks
+        async function loadUserTasks() {
+            try {
+                console.log('Fetching tasks for user:', currentUser);
+                const response = await fetch(`${API_BASE}/tasks?user_email=${encodeURIComponent(userEmail)}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch tasks');
+                }
+                
+                const tasks = await response.json();
+                console.log('Tasks loaded:', tasks);
+
+                updateTasksList(tasks);
+                updateTaskCounts(tasks);
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                throw error;
+            }
+        }
+
+        // Update tasks list
+        function updateTasksList(tasks) {
+            const tasksList = document.getElementById('tasksList');
+            const noTasks = document.getElementById('noTasks');
+
+            if (!tasks || tasks.length === 0) {
+                tasksList.innerHTML = '';
+                noTasks.style.display = 'block';
+                return;
+            }
+
+            noTasks.style.display = 'none';
+            tasksList.innerHTML = tasks.map(task => `
+                <div class="task-card priority-${task.priority}">
+                    <div class="task-header">
+                        <h3 class="task-title">${task.title}</h3>
+                        <span class="status-badge status-${task.status.toLowerCase().replace(' ', '-')}">
+                            ${getStatusLabel(task.status)}
+                        </span>
+                    </div>
+                    <p class="task-description">${task.description}</p>
+                    <div class="task-meta">
+                        <div class="task-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            Due: ${new Date(task.due_date).toLocaleDateString()}
+                        </div>
+                        <div class="task-meta-item">
+                            <i class="fas fa-flag"></i>
+                            <span class="priority-badge priority-${task.priority}">
+                                ${getPriorityLabel(task.priority)}
+                            </span>
+                        </div>
+                        <div class="task-meta-item">
+                            <i class="fas fa-user-tie"></i>
+                            Assigned by: ${task.assigned_by.full_name}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update task counts
+        function updateTaskCounts(tasks) {
+            const totalTasks = tasks.length;
+            const inProgressTasks = tasks.filter(task => task.status === 'In Progress').length;
+            const completedTasks = tasks.filter(task => task.status === 'Completed').length;
+
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('inProgressTasks').textContent = inProgressTasks;
+            document.getElementById('completedTasks').textContent = completedTasks;
+        }
+
+        // Helper functions
+        function getStatusLabel(status) {
+            const labels = {
+                'in progress': '🔧 In Progress',
+                'completed': '✅ Completed'
+            };
+            return labels[status.toLowerCase()] || status;
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = {
+                'low': '🟢 Low',
+                'medium': '🟡 Medium',
+                'high': '🔴 High'
+            };
+            return labels[priority] || priority;
+        }
+
+        // Show error message
+        function showError(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+    </script>
+</body>
+</html> 

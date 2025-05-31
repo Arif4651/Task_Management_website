@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #357abd;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --text-color: #2c3e50;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            padding: 0;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .login-header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .login-header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .login-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .form-control {
+            height: 50px;
+            padding-left: 45px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+
+        .form-select {
+            height: 50px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            padding-left: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            height: 50px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-signup-link {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            height: 50px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-signup-link:hover {
+            background: var(--light-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.1);
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-signup-link:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            animation: slideDown 0.3s ease-out;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .alert.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            color: #e53e3e;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .alert i {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .alert-message {
+            color: #4a5568;
+            font-size: 13px;
+        }
+
+        .form-group.error input {
+            border-color: #e53e3e;
+            background-color: #fff5f5;
+        }
+
+        .form-group.error i {
+            color: #e53e3e;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 5px;
+            padding-left: 15px;
+            display: none;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .role-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .role-option.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .role-option i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 10px;
+            }
+
+            .login-header {
+                padding: 20px;
+            }
+
+            .login-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Welcome Back!</h2>
+            <p>Please login to your account</p>
+        </div>
+        <div class="login-form">
+            <div id="loginMessage"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" 
+                           class="form-control" 
+                           id="email" 
+                           placeholder="Email address" 
+                           required>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           placeholder="Password" 
+                           required>
+                </div>
+                <div class="role-selector">
+                    <div class="role-option active" data-role="regular_user">
+                        <i class="fas fa-user"></i>
+                        User
+                    </div>
+                    <div class="role-option" data-role="admin">
+                        <i class="fas fa-user-shield"></i>
+                        Admin
+                    </div>
+                </div>
+                <input type="hidden" id="role" value="regular_user">
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Login
+                </button>
+                <a href="signup.html" class="btn-signup-link">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Create New Account
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add role selection functionality
+        document.querySelectorAll('.role-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active class from all options
+                document.querySelectorAll('.role-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                // Add active class to clicked option
+                option.classList.add('active');
+                // Update hidden input
+                document.getElementById('role').value = option.dataset.role;
+            });
+        });
+
+        // Enhanced error message display
+        function showError(message, title = 'Login Failed') {
+            const loginMessage = document.getElementById('loginMessage');
+            loginMessage.innerHTML = `
+                <div class="alert alert-danger show">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">${title}</div>
+                        <div class="alert-message">${message}</div>
+                    </div>
+                    <button class="close-alert" onclick="clearError()" style="background: none; border: none; color: #e53e3e; cursor: pointer; padding: 0 8px;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            // Add error state to form fields
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.add('error');
+            });
+        }
+
+        // Function to clear error message
+        function clearError() {
+            const loginMessage = document.getElementById('loginMessage');
+            const alert = loginMessage.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                setTimeout(() => {
+                    loginMessage.innerHTML = '';
+                    document.querySelectorAll('.form-group').forEach(group => {
+                        group.classList.remove('error');
+                    });
+                }, 300);
+            }
+        }
+
+        // Add loading state to login button
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Clear any existing error messages when submitting
+            clearError();
+            
+            const button = this.querySelector('button[type="submit"]');
+            const originalButtonContent = button.innerHTML;
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+            button.disabled = true;
+
+            // Get form data
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            // Simulate API call (replace with your actual login logic)
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password, role })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                    button.innerHTML = originalButtonContent;
+                    button.disabled = false;
+                } else {
+                    // Successful login
+                    // Save session to localStorage
+                    if (data.session) {
+                        localStorage.setItem('session', JSON.stringify(data.session));
+                    }
+                    // Redirect
+                    window.location.href = role === 'admin' ? 'admin-dashboard.html' : 'user-dashboard.html';
+                }
+            })
+            .catch(error => {
+                showError('An error occurred. Please try again later.');
+                button.innerHTML = originalButtonContent;
+                button.disabled = false;
+            });
+        });
+
+        // Clear error state only when user starts typing in the field that had the error
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('input', function() {
+                // Only remove error state from the current field
+                this.parentElement.classList.remove('error');
+                // If all fields are valid, clear the error message
+                const hasErrors = document.querySelectorAll('.form-group.error').length > 0;
+                if (!hasErrors) {
+                    clearError();
+                }
+            });
+        });
+    </script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

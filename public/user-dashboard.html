@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Task Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --pending-color: #f39c12;
+            --in-progress-color: #3498db;
+            --completed-color: #27ae60;
+            --sidebar-width: 250px;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 1.5rem;
+            transition: all var(--transition-speed);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all var(--transition-speed);
+            font-size: 0.95rem;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(74, 144, 226, 0.05) 100%);
+            border-radius: 0 1rem 0 0;
+        }
+
+        .dashboard-header h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-welcome {
+            position: relative;
+            z-index: 1;
+            background: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(74, 144, 226, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all var(--transition-speed);
+        }
+
+        .user-welcome:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: rgba(74, 144, 226, 0.2);
+        }
+
+        .user-welcome .welcome-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            background: rgba(74, 144, 226, 0.1);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .user-welcome .welcome-text {
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .user-welcome .user-name {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: block;
+            margin-top: 0.1rem;
+        }
+
+        .user-info {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: transform var(--transition-speed);
+            height: 100%;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-card h3 {
+            color: #666;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-card p {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-color);
+        }
+
+        .stats-card:nth-child(1)::before { background: var(--primary-color); }
+        .stats-card:nth-child(2)::before { background: var(--in-progress-color); }
+        .stats-card:nth-child(3)::before { background: var(--completed-color); }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .filter-section .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .filter-section .form-select {
+            border: 1px solid #e1e8ed;
+            border-radius: 0.5rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            transition: all var(--transition-speed);
+            background-color: #f8f9fa;
+        }
+
+        .filter-section .form-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .filter-section .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.15);
+            background-color: white;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition-speed);
+            border: 1px solid #e1e8ed;
+        }
+
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-card h4 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .priority-badge, .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .priority-low { 
+            background: #e8f5e9; 
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .priority-medium { 
+            background: #fff3e0; 
+            color: #ef6c00;
+            border: 1px solid #ffe0b2;
+        }
+        .priority-high { 
+            background: #ffebee; 
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-pending { 
+            background: #fff3cd; 
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .status-in-progress { 
+            background: #cce5ff; 
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        .status-completed { 
+            background: #d4edda; 
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .btn-outline-primary {
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+
+            .dashboard-header::before {
+                width: 200px;
+            }
+
+            .user-welcome {
+                padding: 0.5rem 1rem;
+            }
+
+            .user-welcome .welcome-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+            }
+
+            .user-welcome .welcome-text {
+                font-size: 0.85rem;
+            }
+
+            .user-welcome .user-name {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <h3 class="mb-4">My Tasks</h3>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#tasks">
+                        📝 My Tasks
+                    </a>
+                    <a class="nav-link" href="#" onclick="logout()">
+                        🚪 Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="dashboard-header d-flex justify-content-between align-items-center">
+                    <h2>My Task Dashboard</h2>
+                    <div class="user-welcome">
+                        <div class="welcome-icon">👋</div>
+                        <div class="welcome-text">
+                            Welcome back,<br>
+                            <span id="userName" class="user-name">John Doe</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Statistics -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <h3>Total Tasks</h3>
+                            <p id="totalTasks">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <h3>In Progress</h3>
+                            <p id="pendingTasks">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <h3>Completed</h3>
+                            <p id="completedTasks">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label for="priorityFilter" class="form-label">Filter by Priority</label>
+                            <select id="priorityFilter" class="form-select" onchange="applyFilters()">
+                                <option value="all">All Priorities</option>
+                                <option value="low">Low Priority</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="high">High Priority</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="statusFilter" class="form-label">Filter by Status</label>
+                            <select id="statusFilter" class="form-select" onchange="applyFilters()">
+                                <option value="all">All Status</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task List -->
+                <div id="tasksList">
+                    <!-- Tasks will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div class="modal fade" id="taskModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskModalTitle">Task Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="task-details mb-4">
+                        <h4 id="modalTaskTitle"></h4>
+                        <p id="modalTaskDescription" class="text-muted"></p>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Due Date:</strong>
+                                <p id="modalTaskDueDate"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Priority:</strong>
+                                <p id="modalTaskPriority"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Status:</strong>
+                                <p id="modalTaskStatus"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Update Section -->
+                    <div class="status-update mb-4">
+                        <h5>Update Status</h5>
+                        <div class="btn-group" role="group">
+                           
+                            <button type="button" class="btn btn-outline-success btn-status" onclick="updateTaskStatus('completed')">
+                                ✅ Mark as Completed
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="comment-section">
+                        <h5>Comments</h5>
+                        <div id="commentsList" class="mb-3">
+                            <!-- Comments will be populated here -->
+                        </div>
+                        <div class="comment-input-section">
+                            <textarea id="newComment" class="form-control comment-input" rows="2" placeholder="Add a comment..."></textarea>
+                            <button class="btn btn-primary mt-2" onclick="addComment()">Add Comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentUser = null;
+        let taskModal;
+        let currentTaskId = null;
+        let allTasks = []; // Store all tasks
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('User dashboard loaded');
+            taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
+            
+            // Get user session from localStorage
+            const sessionStr = localStorage.getItem('session');
+            console.log('Raw session from localStorage:', sessionStr);
+            
+            if (!sessionStr) {
+                console.error('No session found in localStorage');
+                showAlert('No session found. Please login again.', 'danger');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+                return;
+            }
+
+            try {
+                const session = JSON.parse(sessionStr);
+                console.log('Parsed session:', session);
+                
+                // Validate session structure
+                if (!session || typeof session !== 'object') {
+                    throw new Error('Invalid session format');
+                }
+
+                if (!session.user || typeof session.user !== 'object') {
+                    throw new Error('Invalid session: missing user data');
+                }
+
+                if (!session.user.id || !session.user.email || !session.user.role) {
+                    throw new Error('Invalid session: incomplete user data');
+                }
+
+                if (session.user.role !== 'regular_user') {
+                    throw new Error('Invalid session: wrong user role');
+                }
+
+                if (!session.access_token) {
+                    throw new Error('Invalid session: missing access token');
+                }
+                
+                currentUser = session.user;
+                console.log('Current user set to:', currentUser);
+
+                // Update welcome message with user's name
+                document.getElementById('userName').textContent = currentUser.full_name;
+
+                // Load user's tasks
+                await loadTasks();
+            } catch (error) {
+                console.error('Session validation error:', error);
+                console.error('Session data:', sessionStr);
+                showAlert('Invalid session. Please login again.', 'danger');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+                return;
+            }
+        });
+
+        // Load tasks
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_BASE}/tasks/user/${encodeURIComponent(currentUser.email)}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch tasks');
+                }
+                const data = await response.json();
+                
+                // Store all tasks
+                allTasks = data.tasks;
+                
+                // Update statistics
+                document.getElementById('totalTasks').textContent = data.stats.totalTasks;
+                document.getElementById('pendingTasks').textContent = data.stats.inProgressTasks;
+                document.getElementById('completedTasks').textContent = data.stats.completedTasks;
+
+                // Apply filters and update task list
+                applyFilters();
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                showAlert('Failed to load tasks', 'danger');
+            }
+        }
+
+        // Add new function to apply filters
+        function applyFilters() {
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            console.log('Applying filters:', { priorityFilter, statusFilter });
+
+            // Filter tasks based on selected criteria
+            const filteredTasks = allTasks.filter(task => {
+                const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+                const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+                return matchesPriority && matchesStatus;
+            });
+
+            console.log('Filtered tasks:', filteredTasks);
+            updateTaskList(filteredTasks);
+        }
+
+        // Update task list
+        function updateTaskList(tasks) {
+            console.log('Updating task list with tasks:', tasks);
+            const tasksList = document.getElementById('tasksList');
+            
+            if (!tasks || tasks.length === 0) {
+                console.log('No tasks found, showing empty state');
+                tasksList.innerHTML = `
+                    <div class="text-center p-4">
+                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                        <h3>No Tasks Found</h3>
+                        <p class="text-muted">${allTasks.length === 0 ? 'You haven\'t been assigned any tasks yet.' : 'No tasks match the selected filters.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                tasksList.innerHTML = tasks.map(task => `
+                    <div class="task-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h4 class="mb-2">${task.title}</h4>
+                                <p class="text-muted mb-3">${task.description}</p>
+                                <div class="d-flex gap-3">
+                                    <span class="priority-badge priority-${task.priority}">${getPriorityLabel(task.priority)}</span>
+                                    <span class="status-badge status-${task.status.toLowerCase().replace(' ', '-')}">${getStatusLabel(task.status)}</span>
+                                    <span class="text-muted">Due: ${new Date(task.due_date).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block mb-2">Assigned by: ${task.assigned_by?.full_name || 'Unknown'}</small>
+                                <button class="btn btn-outline-primary btn-sm" onclick="showTaskDetails('${task.id}')">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                console.log('Task list updated successfully');
+            } catch (error) {
+                console.error('Error updating task list:', error);
+                tasksList.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error displaying tasks: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Show task details
+        async function showTaskDetails(taskId) {
+            try {
+                console.log('Loading task details for:', taskId);
+                const response = await fetch(`${API_BASE}/tasks/${taskId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch task details');
+                }
+                const task = await response.json();
+                console.log('Task details loaded:', task);
+
+                currentTaskId = taskId;
+                document.getElementById('modalTaskTitle').textContent = task.title;
+                document.getElementById('modalTaskDescription').textContent = task.description;
+                document.getElementById('modalTaskDueDate').textContent = new Date(task.due_date).toLocaleDateString();
+                document.getElementById('modalTaskPriority').innerHTML = `<span class="priority-badge priority-${task.priority}">${getPriorityLabel(task.priority)}</span>`;
+                document.getElementById('modalTaskStatus').innerHTML = `<span class="status-badge status-${task.status.toLowerCase().replace(' ', '-')}">${getStatusLabel(task.status)}</span>`;
+
+                // Load comments
+                loadComments(taskId);
+
+                taskModal.show();
+            } catch (error) {
+                console.error('Error loading task details:', error);
+                showAlert('Failed to load task details', 'danger');
+            }
+        }
+
+        // Update task status
+        async function updateTaskStatus(newStatus) {
+            if (!currentTaskId || !currentUser) {
+                showAlert('Cannot update task status', 'danger');
+                return;
+            }
+
+            try {
+                console.log('Updating task status:', { taskId: currentTaskId, newStatus, userId: currentUser.id });
+                const response = await fetch(`${API_BASE}/tasks/${currentTaskId}/status`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: 'Completed',  // Always set to Completed when this button is clicked
+                        user_id: currentUser.id
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to update task status');
+                }
+
+                const data = await response.json();
+                console.log('Task status updated successfully:', data);
+
+                // Update the status badge in the modal
+                document.getElementById('modalTaskStatus').innerHTML = 
+                    `<span class="status-badge status-completed">✅ Completed</span>`;
+
+                // Refresh tasks list to show updated status
+                await loadTasks();
+                
+                showAlert('Task marked as completed successfully', 'success');
+                
+                // Close the modal after a short delay
+                setTimeout(() => {
+                    taskModal.hide();
+                }, 1500);
+            } catch (error) {
+                console.error('Error updating task status:', error);
+                showAlert(error.message || 'Failed to update task status', 'danger');
+            }
+        }
+
+        // Load comments
+        async function loadComments(taskId) {
+            try {
+                console.log('Loading comments for task:', taskId);
+                const response = await fetch(`${API_BASE}/tasks/${taskId}/comments`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch comments');
+                }
+                const comments = await response.json();
+                console.log('Comments loaded:', comments);
+
+                const commentsList = document.getElementById('commentsList');
+                if (!comments || comments.length === 0) {
+                    commentsList.innerHTML = '<p class="text-muted">No comments yet</p>';
+                    return;
+                }
+
+                commentsList.innerHTML = comments.map(comment => `
+                    <div class="comment">
+                        <div class="d-flex justify-content-between">
+                            <strong>${comment.user_name}</strong>
+                            <small class="text-muted">${new Date(comment.created_at).toLocaleString()}</small>
+                        </div>
+                        <p class="mb-0">${comment.content}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading comments:', error);
+                document.getElementById('commentsList').innerHTML = '<p class="text-danger">Failed to load comments</p>';
+            }
+        }
+
+        // Add comment
+        async function addComment() {
+            if (!currentTaskId || !currentUser) {
+                showAlert('Cannot add comment', 'danger');
+                return;
+            }
+
+            const commentInput = document.getElementById('newComment');
+            const commentText = commentInput.value.trim();
+            
+            if (!commentText) {
+                showAlert('Please enter a comment', 'warning');
+                return;
+            }
+
+            try {
+                console.log('Adding comment to task:', { 
+                    taskId: currentTaskId, 
+                    userId: currentUser.id,
+                    content: commentText 
+                });
+
+                const response = await fetch(`${API_BASE}/tasks/${currentTaskId}/comments`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: commentText,
+                        user_id: currentUser.id
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to add comment');
+                }
+
+                const newComment = await response.json();
+                console.log('Comment added successfully:', newComment);
+
+                // Clear the comment input
+                commentInput.value = '';
+
+                // Add the new comment to the UI immediately
+                const commentsList = document.getElementById('commentsList');
+                const commentElement = document.createElement('div');
+                commentElement.className = 'comment';
+                commentElement.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <strong>${newComment.user_name}</strong>
+                        <small class="text-muted">${new Date(newComment.created_at).toLocaleString()}</small>
+                    </div>
+                    <p class="mb-0">${newComment.content}</p>
+                `;
+
+                // If there's a "No comments yet" message, remove it
+                if (commentsList.querySelector('p.text-muted')) {
+                    commentsList.innerHTML = '';
+                }
+
+                // Add the new comment at the top of the list
+                commentsList.insertBefore(commentElement, commentsList.firstChild);
+                
+                showAlert('Comment added successfully', 'success');
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                showAlert(error.message || 'Failed to add comment', 'danger');
+            }
+        }
+
+        // Helper functions
+        function getPriorityLabel(priority) {
+            const labels = {
+                'low': '🟢 Low',
+                'medium': '🟡 Medium',
+                'high': '🔴 High'
+            };
+            return labels[priority] || priority;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'in progress': '🔧 In Progress',
+                'completed': '✅ Completed'
+            };
+            return labels[status.toLowerCase()] || status;
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        function logout() {
+            localStorage.removeItem('session');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
