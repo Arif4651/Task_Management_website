@@ -423,7 +423,7 @@
         const clearError = clearMessage;
 
         // Add loading state to login button
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             // Clear any existing messages when submitting
             clearMessage();
@@ -434,43 +434,44 @@
             button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
             button.disabled = true;
 
-            // Get form data
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
+            try {
+                // Get form data
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const role = document.getElementById('role').value;
 
-            // Make the API call
-            fetch(`${API_BASE}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password, role })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showError(data.error);
-                    button.innerHTML = originalButtonContent;
-                    button.disabled = false;
-                } else {
-                    // Show success message before redirecting
-                    showSuccess('Login successful! Redirecting...', 'Success');
-                    // Save session to localStorage
-                    if (data.session) {
-                        localStorage.setItem('session', JSON.stringify(data.session));
-                    }
-                    // Redirect after a short delay to show the success message
-                    setTimeout(() => {
-                        window.location.href = role === 'admin' ? 'admin-dashboard.html' : 'user-dashboard.html';
-                    }, 1000);
+                // Make the API call
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, role })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Login failed');
                 }
-            })
-            .catch(error => {
-                showError('An error occurred. Please try again later.');
+
+                // Show success message before redirecting
+                showSuccess(data.message || 'Login successful! Redirecting...', 'Success');
+                
+                // Save session to localStorage
+                if (data.session) {
+                    localStorage.setItem('session', JSON.stringify(data.session));
+                }
+
+                // Redirect after a short delay to show the success message
+                setTimeout(() => {
+                    window.location.href = role === 'admin' ? 'admin-dashboard.html' : 'user-dashboard.html';
+                }, 1000);
+            } catch (error) {
+                showError(error.message || 'An error occurred. Please try again later.');
                 button.innerHTML = originalButtonContent;
                 button.disabled = false;
-            });
+            }
         });
 
         // Clear error state only when user starts typing in the field that had the error
@@ -486,6 +487,5 @@
             });
         });
     </script>
-    <script src="js/auth.js"></script>
 </body>
 </html>
