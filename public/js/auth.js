@@ -51,29 +51,3 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     document.getElementById('loginMessage').textContent = 'An error occurred during login';
   }
 });
-
-document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const full_name = document.getElementById('full_name').value.trim();
-  const role = document.getElementById('role').value;
-
-  const res = await fetch(`${API_BASE}/signup`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ email, password, full_name, role }),
-  });
-
-  const data = await res.json();
-
-  if (res.ok) {
-    document.getElementById('signupMessage').textContent = data.message;
-    // Redirect to login page after signup
-    setTimeout(() => {
-      window.location.href = '/index.html';
-    }, 1500);
-  } else {
-    document.getElementById('signupMessage').textContent = data.error || 'Signup failed';
-  }
-});

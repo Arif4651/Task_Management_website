@@ -176,8 +176,9 @@
         }
 
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #f0fff4;
+            color: #2f855a;
+            border-left: 4px solid #48bb78;
         }
 
         .alert-danger {
@@ -189,6 +190,22 @@
         .alert i {
             font-size: 20px;
             margin-right: 12px;
+        }
+
+        .alert-success i {
+            color: #48bb78;
+        }
+
+        .alert-danger i {
+            color: #e53e3e;
+        }
+
+        .alert-success .close-alert {
+            color: #48bb78;
+        }
+
+        .alert-success .close-alert:hover {
+            color: #38a169;
         }
 
         .alert-content {
@@ -348,6 +365,23 @@
             });
         });
 
+        // Function to show success message
+        function showSuccess(message, title = 'Success') {
+            const loginMessage = document.getElementById('loginMessage');
+            loginMessage.innerHTML = `
+                <div class="alert alert-success show">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">${title}</div>
+                        <div class="alert-message">${message}</div>
+                    </div>
+                    <button class="close-alert" onclick="clearMessage()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+        }
+
         // Enhanced error message display
         function showError(message, title = 'Login Failed') {
             const loginMessage = document.getElementById('loginMessage');
@@ -358,7 +392,7 @@
                         <div class="alert-title">${title}</div>
                         <div class="alert-message">${message}</div>
                     </div>
-                    <button class="close-alert" onclick="clearError()" style="background: none; border: none; color: #e53e3e; cursor: pointer; padding: 0 8px;">
+                    <button class="close-alert" onclick="clearMessage()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -370,8 +404,8 @@
             });
         }
 
-        // Function to clear error message
-        function clearError() {
+        // Function to clear any message (error or success)
+        function clearMessage() {
             const loginMessage = document.getElementById('loginMessage');
             const alert = loginMessage.querySelector('.alert');
             if (alert) {
@@ -385,11 +419,14 @@
             }
         }
 
+        // Update the clearError function to use clearMessage
+        const clearError = clearMessage;
+
         // Add loading state to login button
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Clear any existing error messages when submitting
-            clearError();
+            // Clear any existing messages when submitting
+            clearMessage();
             
             const button = this.querySelector('button[type="submit"]');
             const originalButtonContent = button.innerHTML;
@@ -402,7 +439,7 @@
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
 
-            // Simulate API call (replace with your actual login logic)
+            // Make the API call
             fetch(`${API_BASE}/login`, {
                 method: 'POST',
                 headers: {
@@ -417,13 +454,16 @@
                     button.innerHTML = originalButtonContent;
                     button.disabled = false;
                 } else {
-                    // Successful login
+                    // Show success message before redirecting
+                    showSuccess('Login successful! Redirecting...', 'Success');
                     // Save session to localStorage
                     if (data.session) {
                         localStorage.setItem('session', JSON.stringify(data.session));
                     }
-                    // Redirect
-                    window.location.href = role === 'admin' ? 'admin-dashboard.html' : 'user-dashboard.html';
+                    // Redirect after a short delay to show the success message
+                    setTimeout(() => {
+                        window.location.href = role === 'admin' ? 'admin-dashboard.html' : 'user-dashboard.html';
+                    }, 1000);
                 }
             })
             .catch(error => {
