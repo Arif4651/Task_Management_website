@@ -1,0 +1,10 @@
+# Ignore environment file
+.env
+
+# Ignore node_modules directory
+node_modules/
+
+# Ignore Supabase directory
+supabase/
+
+# Add other ignores as needed 

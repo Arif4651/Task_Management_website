@@ -1,5 +1,3 @@
-const API_BASE = 'http://localhost:5000/api/auth';
-
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = document.getElementById('email').value.trim();
